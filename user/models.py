@@ -1,6 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+ROLES = [
+        ('SD', 'Student'),
+        ('TA', 'Teaching assistant'),
+        ('IN', 'Instructor'),
+    ]
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, password, **extra_fields):
@@ -27,11 +33,13 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser):
     username = models.CharField(
         verbose_name='username',
-        max_length=100,
+        max_length=200,
         unique=True,
     )
-    auth_token = models.CharField(verbose_name='auth_token', max_length=200, null=True, blank=True)
+    # user_id = models.CharField(verbose_name='user_id', max_length=200, unique=True)
     date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
+    name = models.CharField(verbose_name='name', max_length=100)
+    role = models.CharField(verbose_name='role', max_length=40, choices=ROLES, blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -43,6 +51,9 @@ class CustomUser(AbstractBaseUser):
 
     def get_username(self):
         return self.username
+
+    def get_name(self):
+        return self.name
 
     def __str__(self):
         return self.username

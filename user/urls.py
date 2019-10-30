@@ -10,6 +10,8 @@ app_name = 'user'
 urlpatterns = [
 
     url(r'^user/detail/$', views.UserDetail.as_view()),
+    url(r'^user/feidelogin/$', views.CreateOrLoginUser.as_view()),
+    url(r'^user/changerole/$', views.ChangeUserRole.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
