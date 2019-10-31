@@ -5,6 +5,7 @@ from .models import Score
 from .models import UserIsOnTeam
 from .models import IsTeachingAssistantForSubject
 from .models import EnrolledInSubject
+from .models import PreEnrollmentEntry
 
 
 class TeamInline(admin.StackedInline):
@@ -52,9 +53,15 @@ class EnrolledInSubjectAdmin(admin.ModelAdmin):
     list_display = ('user', 'subject')
 
 
+class PreEnrollmentEntryAdmin(admin.ModelAdmin):
+
+    list_display = ('student_name', 'subject')
+
+
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Score, ScoreAdmin)
 admin.site.register(IsTeachingAssistantForSubject, IsTeachingAssistantAdmin)
 admin.site.register(UserIsOnTeam, UserIsOnTeamAdmin)
 admin.site.register(EnrolledInSubject, EnrolledInSubjectAdmin)
+admin.site.register(PreEnrollmentEntry, PreEnrollmentEntryAdmin)

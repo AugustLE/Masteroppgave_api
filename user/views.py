@@ -1,11 +1,8 @@
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import requests
 from rest_framework import permissions
 from .serializers import UserSerializer
-from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework import status

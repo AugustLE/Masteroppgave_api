@@ -49,3 +49,10 @@ class EnrolledInSubject(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     active = models.BooleanField(default=False)
+
+
+class PreEnrollmentEntry(models.Model):
+
+    student_name = models.CharField(verbose_name='student_name', max_length=200)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    enrolled = models.BooleanField(default=False)
