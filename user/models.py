@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+
 ROLES = [
         ('SD', 'Student'),
         ('TA', 'Teaching assistant'),
@@ -56,7 +57,7 @@ class CustomUser(AbstractBaseUser):
         return self.name
 
     def __str__(self):
-        return self.username
+        return self.name
 
     def has_perm(self, perm, obj=None):
         return True

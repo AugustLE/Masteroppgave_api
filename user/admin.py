@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from .models import CustomUser
+from data.models import Score
 from django.utils.translation import gettext as _
 
 
@@ -45,7 +46,15 @@ class UserChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
+class ScoreInline(admin.StackedInline):
+
+    model = Score
+    extra = 0
+
+
 class UserAdmin(BaseUserAdmin):
+
+    inlines = [ScoreInline]
 
     form = UserChangeForm
     add_form = UserCreationForm
