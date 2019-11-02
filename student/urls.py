@@ -5,12 +5,11 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from django.conf import settings
 from django.conf.urls.static import static
 
-app_name = 'data'
+app_name = 'student'
 
 urlpatterns = [
 
-    url(r'^enrollment/$', views.EnrollmentList.as_view()),
-    url(r'^selectsubject/$', views.SelectSubject.as_view()),
+    url(r'^subject/(?P<subject_id>[0-9]+)/teams/$', views.TeamList.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

@@ -16,6 +16,7 @@ class Team(models.Model):
 
     name = models.CharField(verbose_name='name', max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    password = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name

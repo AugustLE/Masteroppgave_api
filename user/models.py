@@ -41,6 +41,7 @@ class CustomUser(AbstractBaseUser):
     date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
     name = models.CharField(verbose_name='name', max_length=100)
     role = models.CharField(verbose_name='role', max_length=40, choices=ROLES, blank=True, null=True)
+    selected_subject_id = models.CharField(max_length=10000, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
