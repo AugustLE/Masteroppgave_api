@@ -10,6 +10,7 @@ app_name = 'student'
 urlpatterns = [
 
     url(r'^subject/(?P<subject_id>[0-9]+)/teams/$', views.TeamList.as_view()),
+    url(r'^subject/selectteam/$', views.SelectTeam.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

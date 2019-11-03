@@ -56,6 +56,7 @@ class EnrolledInSubjectAdmin(admin.ModelAdmin):
 class PreEnrollmentEntryAdmin(admin.ModelAdmin):
 
     list_display = ('student_name', 'subject')
+    search_fields = ('student_name', 'subject__code', 'subject__name')
 
 
 admin.site.register(Subject, SubjectAdmin)
