@@ -29,13 +29,14 @@ class TeamAdmin(admin.ModelAdmin):
 
     inlines = [UserIsOnTeamInline]
 
-    list_display = ('name', 'subject')
+    list_display = ('name', 'subject', 'last_average_score')
     search_fields = ('name', 'subject')
 
 
 class ScoreAdmin(admin.ModelAdmin):
 
-    list_display = ('user', 'team')
+    list_display = ('user', 'team', 'score', 'date_registered')
+    # readonly_fields = ('date_registered',)
 
 
 class IsTeachingAssistantAdmin(admin.ModelAdmin):

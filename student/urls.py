@@ -1,5 +1,4 @@
 from django.conf.urls import url
-
 from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.conf import settings
@@ -11,6 +10,9 @@ urlpatterns = [
 
     url(r'^subject/(?P<subject_id>[0-9]+)/teams/$', views.TeamList.as_view()),
     url(r'^subject/selectteam/$', views.SelectTeam.as_view()),
+    url(r'^team/status/$', views.TeamStatus.as_view()),
+    url(r'^team/registerscore/$', views.RegisterScore.as_view()),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

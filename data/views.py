@@ -60,7 +60,7 @@ class SelectSubject(APIView):
 
         user.selected_subject_id = subject_id
         user.save()
-        active_enrollment = EnrolledInSubject.objects.get(subject=subject)
+        active_enrollment = EnrolledInSubject.objects.get(subject=subject, user=user)
         active_enrollment.active = True
         active_enrollment.save()
 
