@@ -3,10 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
-from .serializers import EnrollmentSerializer
-from .models import Subject
-from .models import EnrolledInSubject
-from .models import PreEnrollmentEntry
+from .serializers import EnrollmentSerializer, SubjectSerializer
+from student.serializers import TeamSerializer
+from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam
 from user.serializers import UserSerializer
 
 
@@ -18,7 +17,6 @@ class EnrollmentList(APIView):
     def post(self, request):
 
         user = request.user
-
         entries = PreEnrollmentEntry.objects.filter(student_name__contains=user.name)
 
         for entry in entries:
@@ -69,4 +67,26 @@ class SelectSubject(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class ApiUser(APIView):
 
+    permission_classes = (permissions.IsAuthenticated, )
+
+    @csrf_exempt
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user, many=False)
+
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        subject_data = SubjectSerializer(subject, many=False).data
+
+        team = UserIsOnTeam.objects.get(user=user, team__subject=subject).team
+        team_data = None
+        if team:
+            team_data = TeamSerializer(team, many=False).data
+
+        return_object = {
+            'api_user': serializer.data,
+            'team': team_data,
+            'subject': subject_data
+        }
+        return Response(return_object, status=status.HTTP_200_OK)

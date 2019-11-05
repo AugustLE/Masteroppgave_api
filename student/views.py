@@ -24,9 +24,10 @@ class TeamList(APIView):
     permission_classes = (permissions.IsAuthenticated, )
 
     @csrf_exempt
-    def get(self, request, subject_id):
+    def get(self, request):
 
         user = request.user
+        subject_id = user.selected_subject_id
 
         subject = Subject.objects.get(pk=subject_id)
         team = None

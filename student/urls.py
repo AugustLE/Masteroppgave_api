@@ -8,7 +8,8 @@ app_name = 'student'
 
 urlpatterns = [
 
-    url(r'^subject/(?P<subject_id>[0-9]+)/teams/$', views.TeamList.as_view()),
+    #url(r'^subject/(?P<subject_id>[0-9]+)/teams/$', views.TeamList.as_view()),
+    url(r'^subject/teams/$', views.TeamList.as_view()),
     url(r'^subject/selectteam/$', views.SelectTeam.as_view()),
     url(r'^team/status/$', views.TeamStatus.as_view()),
     url(r'^team/registerscore/$', views.RegisterScore.as_view()),
