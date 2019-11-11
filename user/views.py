@@ -8,6 +8,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from .models import CustomUser
 
+TEMP_PASSWORD = '094huersgifu3h'
+
 
 class UserDetail(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -28,16 +30,16 @@ class CreateOrLoginUser(APIView):
     def post(self, request):
 
         userid = request.data.get('userid')
+        username = request.data.get('username')
         name = request.data.get('name')
         auth_token = request.data.get('auth_token')
-        password = request.data.get('password')
 
-        if CustomUser.objects.filter(username=userid).count() == 0:
-            user = CustomUser(username=userid, name=name)
-            user.set_password(password)
+        if CustomUser.objects.filter(username=username).count() == 0:
+            user = CustomUser(username=username, user_id=userid, name=name)
+            user.set_password(TEMP_PASSWORD)
             user.save()
 
-        user = authenticate(username=userid, password=password)
+        user = authenticate(username=username, password=TEMP_PASSWORD)
 
         Token.objects.filter(user=user).delete()
         new_token = Token(user=user, key=auth_token)

@@ -25,7 +25,6 @@ class EnrollmentList(APIView):
                 enroll_student.save()
                 entry.enrolled = True
                 entry.save()
-
         enrollment_list = EnrolledInSubject.objects.filter(user=user)
         serializer = EnrollmentSerializer(enrollment_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -50,18 +49,19 @@ class SelectSubject(APIView):
         subject_id = request.data.get('subject_id')
         subject = Subject.objects.get(pk=subject_id)
 
-        enrolled = EnrolledInSubject.objects.filter(user=user, active=True)
-        if enrolled.count() > 0:
-            for entry in enrolled:
-                entry.active = False
-                entry.save()
+        if user.role == 'SD':
+            enrolled = EnrolledInSubject.objects.filter(user=user, active=True)
+            if enrolled.count() > 0:
+                for entry in enrolled:
+                    entry.active = False
+                    entry.save()
+
+            active_enrollment = EnrolledInSubject.objects.get(subject=subject, user=user)
+            active_enrollment.active = True
+            active_enrollment.save()
 
         user.selected_subject_id = subject_id
         user.save()
-        active_enrollment = EnrolledInSubject.objects.get(subject=subject, user=user)
-        active_enrollment.active = True
-        active_enrollment.save()
-
         serializer = UserSerializer(user, many=False)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -76,17 +76,30 @@ class ApiUser(APIView):
         user = request.user
         serializer = UserSerializer(user, many=False)
 
-        subject = Subject.objects.get(pk=user.selected_subject_id)
-        subject_data = SubjectSerializer(subject, many=False).data
-
-        team = UserIsOnTeam.objects.get(user=user, team__subject=subject).team
-        team_data = None
-        if team:
-            team_data = TeamSerializer(team, many=False).data
+        subject = None
+        subject_data = None
+        if Subject.objects.filter(pk=user.selected_subject_id).count() > 0:
+            subject = Subject.objects.get(pk=user.selected_subject_id)
+            subject_data = SubjectSerializer(subject, many=False).data
 
         return_object = {
             'api_user': serializer.data,
-            'team': team_data,
             'subject': subject_data
         }
+
+        if user.role == 'SD':
+            team = None
+            team_data = None
+            if subject:
+                team = UserIsOnTeam.objects.get(user=user, team__subject=subject).team
+
+            if team:
+                team_data = TeamSerializer(team, many=False).data
+
+            return_object = {
+                'api_user': serializer.data,
+                'team': team_data,
+                'subject': subject_data
+            }
+
         return Response(return_object, status=status.HTTP_200_OK)

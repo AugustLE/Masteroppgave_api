@@ -46,6 +46,12 @@ class IsTeachingAssistantForSubject(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
 
 
+class IsInstructorForSubject(models.Model):
+
+    instructor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+
 class EnrolledInSubject(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -58,3 +64,12 @@ class PreEnrollmentEntry(models.Model):
     student_name = models.CharField(verbose_name='student_name', max_length=200)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     enrolled = models.BooleanField(default=False)
+
+
+class IsResponsibleForTeam(models.Model):
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'team')

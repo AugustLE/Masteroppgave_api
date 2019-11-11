@@ -37,7 +37,7 @@ class CustomUser(AbstractBaseUser):
         max_length=200,
         unique=True,
     )
-    # user_id = models.CharField(verbose_name='user_id', max_length=200, unique=True)
+    user_id = models.CharField(verbose_name='user_id', max_length=200)
     date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
     name = models.CharField(verbose_name='name', max_length=100)
     role = models.CharField(verbose_name='role', max_length=40, choices=ROLES, blank=True, null=True)

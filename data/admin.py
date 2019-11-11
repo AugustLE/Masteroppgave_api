@@ -1,11 +1,6 @@
 from django.contrib import admin
-from .models import Team
-from .models import Subject
-from .models import Score
-from .models import UserIsOnTeam
-from .models import IsTeachingAssistantForSubject
-from .models import EnrolledInSubject
-from .models import PreEnrollmentEntry
+from .models import Team, Subject, Score, UserIsOnTeam, IsTeachingAssistantForSubject, EnrolledInSubject, \
+    PreEnrollmentEntry, IsInstructorForSubject, IsResponsibleForTeam
 
 
 class TeamInline(admin.StackedInline):
@@ -44,6 +39,10 @@ class IsTeachingAssistantAdmin(admin.ModelAdmin):
     list_display = ('teaching_assistant', 'subject')
 
 
+class IsInstructorAdmin(admin.ModelAdmin):
+    list_display = ('instructor', 'subject')
+
+
 class UserIsOnTeamAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'team')
@@ -60,6 +59,10 @@ class PreEnrollmentEntryAdmin(admin.ModelAdmin):
     search_fields = ('student_name', 'subject__code', 'subject__name')
 
 
+class IsResponsibleForTeamAdmin(admin.ModelAdmin):
+    list_display = ('user', 'team')
+
+
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Score, ScoreAdmin)
@@ -67,3 +70,5 @@ admin.site.register(IsTeachingAssistantForSubject, IsTeachingAssistantAdmin)
 admin.site.register(UserIsOnTeam, UserIsOnTeamAdmin)
 admin.site.register(EnrolledInSubject, EnrolledInSubjectAdmin)
 admin.site.register(PreEnrollmentEntry, PreEnrollmentEntryAdmin)
+admin.site.register(IsInstructorForSubject, IsInstructorAdmin)
+admin.site.register(IsResponsibleForTeam, IsResponsibleForTeamAdmin)
