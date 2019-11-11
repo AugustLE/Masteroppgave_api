@@ -18,6 +18,7 @@ class Team(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     password = models.CharField(max_length=20)
     last_average_score = models.DecimalField(max_digits=10, decimal_places=1, default=0)
+    responsible = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name

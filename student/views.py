@@ -5,7 +5,7 @@ from rest_framework import permissions
 from rest_framework import status
 from data.models import Team, Subject, UserIsOnTeam, Score
 from data.serializers import SubjectSerializer
-from .serializers import TeamSerializer
+from data.serializers import TeamSerializer
 from django.db.models import Sum
 import datetime
 import pytz

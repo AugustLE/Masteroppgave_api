@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
 from .serializers import EnrollmentSerializer, SubjectSerializer
-from student.serializers import TeamSerializer
+from .serializers import TeamSerializer
 from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam
 from user.serializers import UserSerializer
 

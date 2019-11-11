@@ -5,7 +5,7 @@ from rest_framework import permissions
 from rest_framework import status
 from data.models import Subject, Team, IsResponsibleForTeam
 from data.serializers import SubjectSerializer
-from student.serializers import TeamSerializer
+from data.serializers import TeamSerializer
 
 
 class SubjectList(APIView):
@@ -47,7 +47,6 @@ class Overview(APIView):
         if responsible_teams.count() > 0:
             responsible_teams_data = TeamSerializer(responsible_teams, many=True).data
 
-        print(total_average)
         return_object = {
             'total_average': total_average,
             'number_teams_below': teams_below,
@@ -58,3 +57,23 @@ class Overview(APIView):
         return Response(return_object, status=status.HTTP_200_OK)
 
 
+class TeamList(APIView):
+
+    permission_classes = (permissions.IsAuthenticated, )
+
+    @csrf_exempt
+    def get(self, request):
+
+        user = request.user
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        teams = Team.objects.filter(subject=subject)
+
+        team_data = TeamSerializer(teams, many=True).data
+        subject_data = SubjectSerializer(subject, many=False).data
+
+        return_object = {
+            'teams': team_data,
+            'subject': subject_data
+        }
+
+        return Response(return_object, status=status.HTTP_200_OK)

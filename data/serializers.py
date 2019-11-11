@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Subject
-from .models import EnrolledInSubject
+from .models import Subject, EnrolledInSubject, Team
+from user.models import CustomUser
 
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -21,3 +21,12 @@ class EnrollmentSerializer(serializers.ModelSerializer):
         fields = ('user', 'subject_code', 'subject_name', 'subject_pk', 'active')
 
 
+class TeamSerializer(serializers.ModelSerializer):
+
+    responsible = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(),
+                                                     source='responsible.name',
+                                                     default=None)
+
+    class Meta:
+        model = Team
+        fields = ('pk', 'name', 'subject', 'last_average_score', 'responsible')
