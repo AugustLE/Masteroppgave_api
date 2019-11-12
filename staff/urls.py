@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^staff/subjects/$', views.SubjectList.as_view()),
     url(r'^staff/overview/$', views.Overview.as_view()),
     url(r'^staff/teams/$', views.TeamList.as_view()),
+    url(r'^staff/teams/(?P<team_id>[0-9]+)/$', views.TeamInfo.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
-from data.models import Subject, Team, IsResponsibleForTeam
+from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
 
@@ -74,6 +74,43 @@ class TeamList(APIView):
         return_object = {
             'teams': team_data,
             'subject': subject_data
+        }
+
+        return Response(return_object, status=status.HTTP_200_OK)
+
+
+class TeamInfo(APIView):
+
+    permission_classes = (permissions.IsAuthenticated, )
+
+    @csrf_exempt
+    def get(self, request, team_id):
+
+        team = Team.objects.get(pk=team_id)
+        team_data = TeamSerializer(team, many=False).data
+        responsible_name = team.responsible.name
+
+        is_on_teams = UserIsOnTeam.objects.filter(team=team)
+        members = []
+        for member in is_on_teams:
+
+            member_scores = Score.objects.filter(user=member.user, team=team)
+            sum_scores = 0
+            counter = 0
+            member_average = None
+            for score in member_scores:
+                sum_scores += score.score
+                counter += 1
+
+            if counter > 0 and sum_scores > 0:
+                member_average = sum_scores/counter
+
+            members.append({'name': member.user.name, 'average_score': member_average})
+
+        return_object = {
+            'responsible': responsible_name,
+            'members': members,
+            'team': team_data
         }
 
         return Response(return_object, status=status.HTTP_200_OK)
