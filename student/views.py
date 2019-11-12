@@ -90,21 +90,20 @@ class TeamStatus(APIView):
         if last_score and last_score.date_registered.date() >= last_monday:
             has_rated_this_week = True
 
-        """score_sum = 0
-        counter = 0
-        for score in Score.objects.filter(team=team):
-            score_sum += score.score
-            counter += 1
+        responsible_name = team.responsible.name
 
-        average_score = None
-        if score_sum > 0 and counter > 0:
-            average_score = score_sum/counter"""
-        print(last_score_value)
+        is_on_teams = UserIsOnTeam.objects.filter(team=team)
+        member_names = []
+        for member in is_on_teams:
+            member_names.append(member.user.name)
+
         return_object = {
             'subject': subject_serializer.data,
             'team': team_serializer.data,
             'last_score': last_score_value,
-            'has_rated_this_week': has_rated_this_week
+            'has_rated_this_week': has_rated_this_week,
+            'team_members': member_names,
+            'team_responsible': responsible_name
         }
 
         return Response(return_object, status=status.HTTP_200_OK)
