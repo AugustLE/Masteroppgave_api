@@ -31,6 +31,7 @@ class Overview(APIView):
         subject = Subject.objects.get(pk=user.selected_subject_id)
         subject_data = SubjectSerializer(subject, many=False).data
         teams = Team.objects.filter(subject=subject)
+        number_of_teams = teams.count()
         total_sum = 0
         counter = 0
         for team in teams:
@@ -39,7 +40,7 @@ class Overview(APIView):
 
         total_average = None
         if total_sum > 0 and counter > 0:
-            total_average = total_sum/counter
+            total_average = round(total_sum/counter, 1)
 
         teams_below = Team.objects.filter(last_average_score__lte=2.5).count()
         responsible_teams = Team.objects.filter(isresponsibleforteam__user=user, subject=subject)
@@ -51,7 +52,8 @@ class Overview(APIView):
             'total_average': total_average,
             'number_teams_below': teams_below,
             'responsible_teams': responsible_teams_data,
-            'subject': subject_data
+            'subject': subject_data,
+            'number_of_teams': number_of_teams
         }
 
         return Response(return_object, status=status.HTTP_200_OK)
@@ -88,7 +90,9 @@ class TeamInfo(APIView):
 
         team = Team.objects.get(pk=team_id)
         team_data = TeamSerializer(team, many=False).data
-        responsible_name = team.responsible.name
+        responsible_name = None
+        if team.responsible:
+            responsible_name = team.responsible.name
 
         is_on_teams = UserIsOnTeam.objects.filter(team=team)
         members = []
@@ -112,5 +116,6 @@ class TeamInfo(APIView):
             'members': members,
             'team': team_data
         }
+        print(return_object)
 
         return Response(return_object, status=status.HTTP_200_OK)

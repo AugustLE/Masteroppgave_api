@@ -5,8 +5,11 @@ from rest_framework import permissions
 from rest_framework import status
 from .serializers import EnrollmentSerializer, SubjectSerializer
 from .serializers import TeamSerializer
-from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam
+from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, IsResponsibleForTeam
+from user.models import CustomUser
 from user.serializers import UserSerializer
+import random
+import datetime
 
 
 class EnrollmentList(APIView):
@@ -103,3 +106,63 @@ class ApiUser(APIView):
             }
 
         return Response(return_object, status=status.HTTP_200_OK)
+
+
+### THIS IS A TEST FUNCTION TO GENERATE TEST DATA
+class TestData(APIView):
+
+    permission_classes = (permissions.AllowAny, )
+
+    @csrf_exempt
+    def get(self, request):
+
+        user_counter = 3
+        for i in range(50):
+            subject = Subject.objects.get(pk=1)
+            name = 'Team ' + str(i + 2)
+            new_team = Team(name=name, password='123', subject=subject)
+            new_team.save()
+
+            tas = CustomUser.objects.filter(role='TA')
+            ta = tas[i % tas.count()]
+            is_res = IsResponsibleForTeam(user=ta, team=new_team)
+            is_res.save()
+            new_team.responsible = ta
+            new_team.save()
+
+
+            team_sum = 0
+            team_score_counter = 0
+
+            for h in range(4):
+                user_name = 'Testuser ' + str(user_counter)
+                user_id = 'test-' + str(user_counter)
+
+                test_user = CustomUser(
+                    username=user_name,
+                    user_id=user_id,
+                    name=user_name,
+                    role='SD',
+                    selected_subject_id=1
+                )
+                test_user.save()
+
+                is_on_team = UserIsOnTeam(user=test_user, team=new_team)
+                is_on_team.save()
+
+                for k in range(10):
+                    score_value = random.randint(1, 5)
+                    date = datetime.datetime.now()
+                    test_score = Score(score=score_value, user=test_user, team=new_team, date_registered=date)
+                    test_score.save()
+
+                    team_score_counter += 1
+                    team_sum += score_value
+
+                user_counter += 1
+
+            team_average = team_sum / team_score_counter
+            new_team.last_average_score = team_average
+            new_team.save()
+
+        return Response('data generated', status=status.HTTP_200_OK)
