@@ -25,7 +25,7 @@ class TeamAdmin(admin.ModelAdmin):
     inlines = [UserIsOnTeamInline]
 
     list_display = ('name', 'subject', 'last_average_score')
-    search_fields = ('name', 'subject')
+    search_fields = ('name', 'subject__code', 'subject__name')
 
 
 class ScoreAdmin(admin.ModelAdmin):
@@ -46,6 +46,7 @@ class IsInstructorAdmin(admin.ModelAdmin):
 class UserIsOnTeamAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'team')
+    search_fields = ('user__username', 'team__name')
 
 
 class EnrolledInSubjectAdmin(admin.ModelAdmin):
