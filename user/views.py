@@ -9,7 +9,7 @@ from rest_framework import status
 from .models import CustomUser
 
 TEMP_PASSWORD = '094huersgifu3h'
-
+###
 
 class UserDetail(APIView):
     permission_classes = (permissions.IsAuthenticated,)
