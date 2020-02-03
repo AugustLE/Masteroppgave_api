@@ -6,10 +6,12 @@ from .serializers import UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from .models import CustomUser
+from .models import CustomUser, AuthorizedInstructor
+from data.models import PreEnrollmentEntry
 
 TEMP_PASSWORD = '094huersgifu3h'
 ###
+
 
 class UserDetail(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -41,12 +43,17 @@ class CreateOrLoginUser(APIView):
 
         user = authenticate(username=username, password=TEMP_PASSWORD)
 
+        is_authorized_instructor = False
+        if AuthorizedInstructor.objects.filter(feide_username=username).count() > 0:
+            is_authorized_instructor = True
+
         Token.objects.filter(user=user).delete()
         new_token = Token(user=user, key=auth_token)
         new_token.save()
 
-        serializer = UserSerializer(user, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user_data = UserSerializer(user, many=False).data
+        user_data['is_authorized_instructor'] = is_authorized_instructor
+        return Response(user_data, status=status.HTTP_200_OK)
 
 
 class ChangeUserRole(APIView):
@@ -57,12 +64,19 @@ class ChangeUserRole(APIView):
 
         role_type = request.data.get('role')
         user = request.user
-        if role_type == 'SD':
-            role = 'SD'
-        else:
-            role = 'IN'
 
-        user.role = role
+        if role_type == 'SD':
+            is_student = PreEnrollmentEntry.objects.filter(feide_username=user.username,
+                                                           student_name=user.name).count() > 0
+            if not is_student:
+                return Response({'error': 'It seems like you are an instructor..'},
+                                status=status.HTTP_200_OK)
+        elif role_type == 'TA' or role_type == 'IN':
+            is_authorized_instructor = AuthorizedInstructor.objects.filter(feide_username=user.username).count() > 0
+            if not is_authorized_instructor:
+                return Response({'error': 'You are not authorized for this role..'}, status=status.HTTP_200_OK)
+
+        user.role = role_type
         user.save()
 
         serializer = UserSerializer(user, many=False)

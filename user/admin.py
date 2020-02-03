@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import CustomUser
+from .models import CustomUser, AuthorizedInstructor
 from data.models import Score
 from django.utils.translation import gettext as _
 
@@ -80,3 +80,4 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(CustomUser, UserAdmin)
 admin.site.unregister(Group)
+admin.site.register(AuthorizedInstructor)

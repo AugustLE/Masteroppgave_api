@@ -93,7 +93,7 @@ class ApiUser(APIView):
         if user.role == 'SD':
             team = None
             team_data = None
-            if subject:
+            if subject and UserIsOnTeam.objects.filter(user=user, team__subject=subject).count() > 0:
                 team = UserIsOnTeam.objects.get(user=user, team__subject=subject).team
 
             if team:

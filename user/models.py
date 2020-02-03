@@ -74,3 +74,11 @@ class CustomUser(AbstractBaseUser):
 def userprofile_dirctory_path(instance, filename):
     return 'imagedir/userprofiles/{0}/{1}'.format(instance.id, filename)
 
+
+class AuthorizedInstructor(models.Model):
+
+    feide_username = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.feide_username
+

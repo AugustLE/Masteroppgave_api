@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
 from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score
+from user.models import CustomUser
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
 
@@ -119,3 +120,39 @@ class TeamInfo(APIView):
         print(return_object)
 
         return Response(return_object, status=status.HTTP_200_OK)
+
+
+class TeamUploader(APIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @csrf_exempt
+    def post(self, request):
+        user = request.user
+        team_json = request.data.get('team_json')
+        for team in team_json:
+
+            user_subject = Subject.objects.get(pk=user.selected_subject_id)
+            responsible = None
+            if CustomUser.objects.filter(username=team['responsible']).count() > 0:
+                responsible = CustomUser.objects.get(username=team['responsible'])
+            if Team.objects.filter(name=team['name']).count() == 0:
+                current_team = Team(name=team['name'], subject=user_subject)
+                current_team.save()
+            else:
+                current_team = Team.objects.get(name=team['name'])
+
+            if responsible and IsResponsibleForTeam.objects.filter(user=responsible, team=current_team).count() == 0:
+                new_responsible = IsResponsibleForTeam(user=responsible, team=current_team)
+                new_responsible.save()
+                current_team.responsible = responsible
+                current_team.save()
+
+            for member in team['members']:
+                if CustomUser.objects.filter(username=member).count() > 0:
+                    current_member = CustomUser.objects.get(username=member)
+                    if UserIsOnTeam.objects.filter(user=current_member, team__subject=user_subject).count() == 0:
+                        new_onteam = UserIsOnTeam(user=current_member, team=current_team)
+                        new_onteam.save()
+
+        return Response({}, status=status.HTTP_200_OK)

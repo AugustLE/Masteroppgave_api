@@ -14,9 +14,9 @@ class Subject(models.Model):
 
 class Team(models.Model):
 
-    name = models.CharField(verbose_name='name', max_length=100)
+    name = models.CharField(verbose_name='name', max_length=100, unique=True)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=20, null=True, blank=True)
     last_average_score = models.DecimalField(max_digits=10, decimal_places=1, default=0)
     responsible = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
 
@@ -63,6 +63,7 @@ class EnrolledInSubject(models.Model):
 class PreEnrollmentEntry(models.Model):
 
     student_name = models.CharField(verbose_name='student_name', max_length=200)
+    feide_username = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     enrolled = models.BooleanField(default=False)
 
@@ -74,3 +75,4 @@ class IsResponsibleForTeam(models.Model):
 
     class Meta:
         unique_together = ('user', 'team')
+
