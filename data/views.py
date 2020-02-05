@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
 from .serializers import EnrollmentSerializer, SubjectSerializer
-from .serializers import TeamSerializer
-from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, IsResponsibleForTeam
+from .serializers import TeamSerializer, PrivacyConsentSerializer
+from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, IsResponsibleForTeam, PrivacyConsent
 from user.models import CustomUser
 from user.serializers import UserSerializer
 import random
 import datetime
+from project_api.settings import SECRET_KEY
 
 
 class EnrollmentList(APIView):
@@ -18,7 +19,6 @@ class EnrollmentList(APIView):
     # This method enroll the student in the registered courses, and sends back the enrolled courses
     @csrf_exempt
     def post(self, request):
-
         user = request.user
         entries = PreEnrollmentEntry.objects.filter(student_name__contains=user.name)
 
@@ -34,7 +34,6 @@ class EnrollmentList(APIView):
 
     @csrf_exempt
     def get(self, request):
-
         user = request.user
         enrollment_list = EnrolledInSubject.objects.filter(user=user)
         serializer = EnrollmentSerializer(enrollment_list, many=True)
@@ -106,6 +105,41 @@ class ApiUser(APIView):
             }
 
         return Response(return_object, status=status.HTTP_200_OK)
+
+
+class GetPrivacyConsent(APIView):
+
+    permission_classes = (permissions.AllowAny, )
+
+    @csrf_exempt
+    def get(self, request, username):
+
+        #if secret_key != SECRET_KEY:
+         #   return Response({'error': 'No authorization'}, status=status.HTTP_200_OK)
+
+        if PrivacyConsent.objects.filter(username=username).count() > 0:
+
+            consent = PrivacyConsent.objects.get(username=username)
+            data = PrivacyConsentSerializer(consent, many=False).data
+            return Response(data, status=status.HTTP_200_OK)
+
+        return Response({'username': username, 'has_accepted': False}, status=status.HTTP_200_OK)
+
+    @csrf_exempt
+    def post(self, request):
+
+        has_accepted = request.data.get('has_accepted')
+        feide_username = request.data.get('feide_username')
+        date = datetime.datetime.now()
+        if PrivacyConsent.objects.filter(username=feide_username).count == 0:
+            privacy_object = PrivacyConsent(username=feide_username, has_accepted=has_accepted, date_accepted=date)
+        else:
+            privacy_object = PrivacyConsent.objects.get(username=feide_username)
+            privacy_object.has_accepted = has_accepted
+        privacy_object.save()
+        data = PrivacyConsentSerializer(privacy_object, many=False).data
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 ### THIS IS A TEST FUNCTION TO GENERATE TEST DATA

@@ -76,3 +76,18 @@ class IsResponsibleForTeam(models.Model):
     class Meta:
         unique_together = ('user', 'team')
 
+
+class PrivacyConsent(models.Model):
+    has_accepted = models.BooleanField(default=False)
+    date_accepted = models.DateTimeField(verbose_name='privacyConsent_date', null=True, blank=True)
+    username = models.CharField(max_length=100, unique=True)
+
+
+class AuthorizedInstructor(models.Model):
+
+    feide_username = models.CharField(max_length=100, unique=True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.feide_username
+

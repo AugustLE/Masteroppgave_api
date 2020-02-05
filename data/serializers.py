@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Subject, EnrolledInSubject, Team
+from .models import Subject, EnrolledInSubject, Team, PrivacyConsent
 from user.models import CustomUser
 
 
@@ -30,3 +30,10 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ('pk', 'name', 'subject', 'last_average_score', 'responsible')
+
+
+class PrivacyConsentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PrivacyConsent
+        fields = ('pk', 'username', 'has_accepted')
