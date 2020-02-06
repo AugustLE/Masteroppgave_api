@@ -1,5 +1,6 @@
 from django.db import models
 from user.models import CustomUser
+from user.models import ROLES
 
 
 class Subject(models.Model):
@@ -14,11 +15,14 @@ class Subject(models.Model):
 
 class Team(models.Model):
 
-    name = models.CharField(verbose_name='name', max_length=100, unique=True)
+    name = models.CharField(verbose_name='name', max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     password = models.CharField(max_length=20, null=True, blank=True)
     last_average_score = models.DecimalField(max_digits=10, decimal_places=1, default=0)
     responsible = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        unique_together = ('name', 'subject',)
 
     def __str__(self):
         return self.name
@@ -91,3 +95,10 @@ class AuthorizedInstructor(models.Model):
     def __str__(self):
         return self.feide_username
 
+
+class PreTeamRegister(models.Model):
+
+    feide_username = models.CharField(max_length=100, unique=True)
+    team_name = models.CharField(max_length=100, unique=True)
+    role = models.CharField(verbose_name='role', max_length=40, choices=ROLES, blank=True, null=True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)

@@ -5,7 +5,7 @@ from rest_framework import permissions
 from rest_framework import status
 from .serializers import EnrollmentSerializer, SubjectSerializer
 from .serializers import TeamSerializer, PrivacyConsentSerializer
-from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, IsResponsibleForTeam, PrivacyConsent
+from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, IsResponsibleForTeam, PrivacyConsent, AuthorizedInstructor
 from user.models import CustomUser
 from user.serializers import UserSerializer
 import random
@@ -51,16 +51,22 @@ class SelectSubject(APIView):
         subject_id = request.data.get('subject_id')
         subject = Subject.objects.get(pk=subject_id)
 
-        if user.role == 'SD':
+        if PreEnrollmentEntry.objects.filter(subject=subject, feide_username=user.username).count() > 0:
+            user.role = 'SD'
+            user.save()
             enrolled = EnrolledInSubject.objects.filter(user=user, active=True)
             if enrolled.count() > 0:
                 for entry in enrolled:
-                    entry.active = False
-                    entry.save()
-
-            active_enrollment = EnrolledInSubject.objects.get(subject=subject, user=user)
+                    entry.delete()
+                    #entry.active = False
+                    #entry.save()
+            active_enrollment = EnrolledInSubject(subject=subject, user=user)
             active_enrollment.active = True
             active_enrollment.save()
+
+        elif AuthorizedInstructor.objects.filter(subject=subject, feide_username=user.username).count() > 1:
+            user.role = 'IN'
+            user.save()
 
         user.selected_subject_id = subject_id
         user.save()
@@ -142,7 +148,18 @@ class GetPrivacyConsent(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-### THIS IS A TEST FUNCTION TO GENERATE TEST DATA
+class SubjectList(APIView):
+
+    permission_classes = (permissions.IsAuthenticated, )
+
+    @csrf_exempt
+    def get(self, request):
+        subjects = Subject.objects.all()
+        response_data = SubjectSerializer(subjects, many=True).data
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+### TEST FUNCTION TO GENERATE TEST DATA
 class TestData(APIView):
 
     permission_classes = (permissions.AllowAny, )

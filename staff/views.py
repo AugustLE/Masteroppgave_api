@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
-from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score
+from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score, PreTeamRegister
 from user.models import CustomUser
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
@@ -125,7 +125,7 @@ class TeamInfo(APIView):
 class TeamUploader(APIView):
 
     permission_classes = (permissions.IsAuthenticated,)
-
+    ## Registrer PreTeamRegister .....
     @csrf_exempt
     def post(self, request):
         user = request.user
@@ -136,12 +136,22 @@ class TeamUploader(APIView):
             responsible = None
             if CustomUser.objects.filter(username=team['responsible']).count() > 0:
                 responsible = CustomUser.objects.get(username=team['responsible'])
+            else:
+                pre_ta_register = PreTeamRegister(
+                    feide_username=team['responsible'],
+                    role='IN',
+                    team_name=team['name'],
+                    subject=user_subject
+                )
+                pre_ta_register.save()
+
             if Team.objects.filter(name=team['name']).count() == 0:
                 current_team = Team(name=team['name'], subject=user_subject)
                 current_team.save()
             else:
                 current_team = Team.objects.get(name=team['name'])
 
+            # Dette må også gjøres når en TA registrerer seg etter et team er laget
             if responsible and IsResponsibleForTeam.objects.filter(user=responsible, team=current_team).count() == 0:
                 new_responsible = IsResponsibleForTeam(user=responsible, team=current_team)
                 new_responsible.save()
@@ -154,5 +164,13 @@ class TeamUploader(APIView):
                     if UserIsOnTeam.objects.filter(user=current_member, team__subject=user_subject).count() == 0:
                         new_onteam = UserIsOnTeam(user=current_member, team=current_team)
                         new_onteam.save()
+                else:
+                    pre_student_register = PreTeamRegister(
+                        feide_username=member,
+                        team_name=team['name'],
+                        role='SD',
+                        subject=user_subject
+                    )
+                    pre_student_register.save()
 
         return Response({}, status=status.HTTP_200_OK)

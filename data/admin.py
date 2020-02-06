@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Team, Subject, Score, UserIsOnTeam, IsTeachingAssistantForSubject, EnrolledInSubject, \
-    PreEnrollmentEntry, IsInstructorForSubject, IsResponsibleForTeam, PrivacyConsent
+    PreEnrollmentEntry, IsInstructorForSubject, IsResponsibleForTeam, PrivacyConsent, PreTeamRegister
 
 
 class TeamInline(admin.StackedInline):
@@ -70,6 +70,13 @@ class PrivacyConsentAdmin(admin.ModelAdmin):
     list_filter = ('has_accepted', )
 
 
+class PreTeamRegisterAdmin(admin.ModelAdmin):
+
+    list_display = ('feide_username', 'team_name', 'role')
+    search_fields = ('feide_username', 'team_name')
+    list_filter = ('role',)
+
+
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Score, ScoreAdmin)
@@ -80,3 +87,4 @@ admin.site.register(PreEnrollmentEntry, PreEnrollmentEntryAdmin)
 admin.site.register(IsInstructorForSubject, IsInstructorAdmin)
 admin.site.register(IsResponsibleForTeam, IsResponsibleForTeamAdmin)
 admin.site.register(PrivacyConsent, PrivacyConsentAdmin)
+admin.site.register(PreTeamRegister, PreTeamRegisterAdmin)

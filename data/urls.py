@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^testdata/$', views.TestData.as_view()),
     url(r'^privacyconsent/(?P<username>\w+)/$', views.GetPrivacyConsent.as_view()),
     url(r'^privacyconsent/$', views.GetPrivacyConsent.as_view()),
+    url(r'^subjectlist/$', views.SubjectList.as_view()),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
