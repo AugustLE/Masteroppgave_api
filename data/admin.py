@@ -72,7 +72,7 @@ class PrivacyConsentAdmin(admin.ModelAdmin):
 
 class PreTeamRegisterAdmin(admin.ModelAdmin):
 
-    list_display = ('feide_username', 'team_name', 'role')
+    list_display = ('feide_username', 'team', 'role')
     search_fields = ('feide_username', 'team_name')
     list_filter = ('role',)
 

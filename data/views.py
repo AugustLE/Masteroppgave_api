@@ -5,7 +5,8 @@ from rest_framework import permissions
 from rest_framework import status
 from .serializers import EnrollmentSerializer, SubjectSerializer
 from .serializers import TeamSerializer, PrivacyConsentSerializer
-from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, IsResponsibleForTeam, PrivacyConsent, AuthorizedInstructor
+from .models import Subject, EnrolledInSubject, PreEnrollmentEntry, UserIsOnTeam, Team, Score, \
+    IsResponsibleForTeam, PrivacyConsent, AuthorizedInstructor, PreTeamRegister
 from user.models import CustomUser
 from user.serializers import UserSerializer
 import random
@@ -68,11 +69,30 @@ class SelectSubject(APIView):
             user.role = 'IN'
             user.save()
 
-        user.selected_subject_id = subject_id
-        user.save()
-        serializer = UserSerializer(user, many=False)
+        permission = False
+        if PreTeamRegister.objects.filter(feide_username=user.username, subject=subject).count() > 0:
+            permission = True
+            pre_register = PreTeamRegister.objects.get(feide_username=user.username, subject=subject)
+            user.role = pre_register.role
+            if pre_register.role == 'SD':
+                new_on_team = UserIsOnTeam(team=pre_register.team, user=user)
+                new_on_team.save()
+            elif pre_register.role == 'IN' or pre_register.role == 'TA':
+                if IsResponsibleForTeam.objects.filter(user=user, team=pre_register.team).count() == 0:
+                    new_responsible = IsResponsibleForTeam(user=user, team=pre_register.team)
+                    new_responsible.save()
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+                pre_register.team.responsible = user
+                pre_register.team.save()
+
+            user.selected_subject_id = subject_id
+
+        user.save()
+
+        user_data = UserSerializer(user, many=False).data
+        if not permission:
+            user_data['error'] = 'You dont have permission to this course'
+        return Response(user_data, status=status.HTTP_200_OK)
 
 
 class ApiUser(APIView):
@@ -137,7 +157,7 @@ class GetPrivacyConsent(APIView):
         has_accepted = request.data.get('has_accepted')
         feide_username = request.data.get('feide_username')
         date = datetime.datetime.now()
-        if PrivacyConsent.objects.filter(username=feide_username).count == 0:
+        if PrivacyConsent.objects.filter(username=feide_username).count() == 0:
             privacy_object = PrivacyConsent(username=feide_username, has_accepted=has_accepted, date_accepted=date)
         else:
             privacy_object = PrivacyConsent.objects.get(username=feide_username)

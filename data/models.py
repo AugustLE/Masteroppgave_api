@@ -98,7 +98,10 @@ class AuthorizedInstructor(models.Model):
 
 class PreTeamRegister(models.Model):
 
-    feide_username = models.CharField(max_length=100, unique=True)
-    team_name = models.CharField(max_length=100, unique=True)
+    feide_username = models.CharField(max_length=100)
     role = models.CharField(verbose_name='role', max_length=40, choices=ROLES, blank=True, null=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('feide_username', 'team',)

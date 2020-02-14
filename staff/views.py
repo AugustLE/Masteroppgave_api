@@ -134,22 +134,38 @@ class TeamUploader(APIView):
 
             user_subject = Subject.objects.get(pk=user.selected_subject_id)
             responsible = None
-            if CustomUser.objects.filter(username=team['responsible']).count() > 0:
-                responsible = CustomUser.objects.get(username=team['responsible'])
-            else:
-                pre_ta_register = PreTeamRegister(
-                    feide_username=team['responsible'],
-                    role='IN',
-                    team_name=team['name'],
-                    subject=user_subject
-                )
-                pre_ta_register.save()
 
             if Team.objects.filter(name=team['name']).count() == 0:
                 current_team = Team(name=team['name'], subject=user_subject)
                 current_team.save()
             else:
-                current_team = Team.objects.get(name=team['name'])
+                current_team = Team.objects.get(name=team['name'], subject=user_subject)
+
+            role = 'TA'
+            feide_username = team['responsible']
+            if team['instructor']:
+                role = 'IN'
+                feide_username = team['instructor']
+
+            if CustomUser.objects.filter(username=feide_username).count() > 0:
+                responsible = CustomUser.objects.get(username=feide_username)
+                responsible.role = role
+                responsible.save()
+
+            if PreTeamRegister.objects.filter(feide_username=feide_username, team=current_team, subject=user_subject).count() == 0:
+                pre_ta_register = PreTeamRegister(
+                    feide_username=feide_username,
+                    role=role,
+                    team=current_team,
+                    subject=user_subject
+                )
+                pre_ta_register.save()
+            else:
+                pre_ta_register = PreTeamRegister.objects.get(feide_username=feide_username, team=current_team, subject=user_subject)
+                pre_ta_register.role = role
+                pre_ta_register.save()
+
+
 
             # Dette må også gjøres når en TA registrerer seg etter et team er laget
             if responsible and IsResponsibleForTeam.objects.filter(user=responsible, team=current_team).count() == 0:
@@ -165,12 +181,13 @@ class TeamUploader(APIView):
                         new_onteam = UserIsOnTeam(user=current_member, team=current_team)
                         new_onteam.save()
                 else:
-                    pre_student_register = PreTeamRegister(
-                        feide_username=member,
-                        team_name=team['name'],
-                        role='SD',
-                        subject=user_subject
-                    )
-                    pre_student_register.save()
+                    if PreTeamRegister.objects.filter(feide_username=member).count() == 0:
+                        pre_student_register = PreTeamRegister(
+                            feide_username=member,
+                            team=current_team,
+                            role='SD',
+                            subject=user_subject
+                        )
+                        pre_student_register.save()
 
         return Response({}, status=status.HTTP_200_OK)
