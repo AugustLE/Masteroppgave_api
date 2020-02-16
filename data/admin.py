@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Team, Subject, Score, UserIsOnTeam, IsTeachingAssistantForSubject, EnrolledInSubject, \
-    PreEnrollmentEntry, IsInstructorForSubject, IsResponsibleForTeam, PrivacyConsent, PreTeamRegister
+from .models import Team, Subject, Score, UserIsOnTeam, \
+    IsResponsibleForTeam, PrivacyConsent, PreTeamRegister
 
 
 class TeamInline(admin.StackedInline):
@@ -34,30 +34,10 @@ class ScoreAdmin(admin.ModelAdmin):
     # readonly_fields = ('date_registered',)
 
 
-class IsTeachingAssistantAdmin(admin.ModelAdmin):
-
-    list_display = ('teaching_assistant', 'subject')
-
-
-class IsInstructorAdmin(admin.ModelAdmin):
-    list_display = ('instructor', 'subject')
-
-
 class UserIsOnTeamAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'team')
     search_fields = ('user__username', 'team__name')
-
-
-class EnrolledInSubjectAdmin(admin.ModelAdmin):
-
-    list_display = ('user', 'subject')
-
-
-class PreEnrollmentEntryAdmin(admin.ModelAdmin):
-
-    list_display = ('feide_username', 'student_name', 'subject')
-    search_fields = ('student_name', 'subject__code', 'subject__name')
 
 
 class IsResponsibleForTeamAdmin(admin.ModelAdmin):
@@ -80,11 +60,7 @@ class PreTeamRegisterAdmin(admin.ModelAdmin):
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Score, ScoreAdmin)
-admin.site.register(IsTeachingAssistantForSubject, IsTeachingAssistantAdmin)
 admin.site.register(UserIsOnTeam, UserIsOnTeamAdmin)
-admin.site.register(EnrolledInSubject, EnrolledInSubjectAdmin)
-admin.site.register(PreEnrollmentEntry, PreEnrollmentEntryAdmin)
-admin.site.register(IsInstructorForSubject, IsInstructorAdmin)
 admin.site.register(IsResponsibleForTeam, IsResponsibleForTeamAdmin)
 admin.site.register(PrivacyConsent, PrivacyConsentAdmin)
 admin.site.register(PreTeamRegister, PreTeamRegisterAdmin)

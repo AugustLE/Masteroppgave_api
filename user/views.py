@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from .models import CustomUser
-from data.models import PreEnrollmentEntry, AuthorizedInstructor, PreTeamRegister, UserIsOnTeam, IsResponsibleForTeam, PrivacyConsent
+from data.models import AuthorizedInstructor, PreTeamRegister, UserIsOnTeam, IsResponsibleForTeam, PrivacyConsent
 
 TEMP_PASSWORD = '094huersgifu3h'
 ###
@@ -76,33 +76,6 @@ class CreateOrLoginUser(APIView):
         user_data = UserSerializer(user, many=False).data
         user_data['is_authorized_instructor'] = is_authorized_instructor
         return Response(user_data, status=status.HTTP_200_OK)
-
-
-class ChangeUserRole(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    @csrf_exempt
-    def post(self, request):
-
-        role_type = request.data.get('role')
-        user = request.user
-
-        if role_type == 'SD':
-            is_student = PreEnrollmentEntry.objects.filter(feide_username=user.username,
-                                                           student_name=user.name).count() > 0
-            if not is_student:
-                return Response({'error': 'It seems like you´re not registered in this course'},
-                                status=status.HTTP_200_OK)
-        elif role_type == 'TA' or role_type == 'IN':
-            is_authorized_instructor = AuthorizedInstructor.objects.filter(feide_username=user.username).count() > 0
-            if not is_authorized_instructor:
-                return Response({'error': 'You are not authorized for this role..'}, status=status.HTTP_200_OK)
-
-        user.role = role_type
-        user.save()
-
-        serializer = UserSerializer(user, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

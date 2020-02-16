@@ -8,7 +8,6 @@ app_name = 'staff'
 
 urlpatterns = [
 
-    url(r'^staff/subjects/$', views.SubjectList.as_view()),
     url(r'^staff/overview/$', views.Overview.as_view()),
     url(r'^staff/teams/$', views.TeamList.as_view()),
     url(r'^staff/teams/(?P<team_id>[0-9]+)/$', views.TeamInfo.as_view()),

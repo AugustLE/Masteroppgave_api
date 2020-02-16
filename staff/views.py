@@ -9,19 +9,6 @@ from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
 
 
-class SubjectList(APIView):
-
-    permission_classes = (permissions.IsAuthenticated, )
-
-    @csrf_exempt
-    def get(self, request):
-        user = request.user
-        subjects = Subject.objects.filter(isinstructorforsubject__instructor=user)
-        serializer = SubjectSerializer(subjects, many=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class Overview(APIView):
 
     permission_classes = (permissions.IsAuthenticated, )
