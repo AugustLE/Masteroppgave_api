@@ -17,9 +17,10 @@ class Team(models.Model):
 
     name = models.CharField(verbose_name='name', max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    password = models.CharField(max_length=20, null=True, blank=True)
     last_average_score = models.DecimalField(max_digits=10, decimal_places=1, default=0)
     responsible = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+    number_of_scores = models.IntegerField(default=0)
+    diverse_scores = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('name', 'subject',)

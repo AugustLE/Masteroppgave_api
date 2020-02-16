@@ -124,12 +124,24 @@ class RegisterScore(APIView):
         if not score_sum:
             score_sum = 0
 
+        participants = []
+        for score in all_scores:
+            participant = score.user.username
+            if participant not in participants:
+                participants.append(participant)
+
+        diverse_scores = False
+        if len(participants) > 2:
+            diverse_scores = True
+
         time_now = get_current_oslo_time()
         new_score = Score(score=score_value, user=request.user, team=team, date_registered=time_now)
         new_score.save()
 
         new_average = (score_sum + score_value) / (number_of_scores + 1)
         team.last_average_score = new_average
+        team.number_of_scores = number_of_scores + 1
+        team.diverse_scores = diverse_scores
         team.save()
 
         team_data = TeamSerializer(team, many=False).data

@@ -150,8 +150,8 @@ class TestData(APIView):
         user_counter = 3
         for i in range(50):
             subject = Subject.objects.get(pk=1)
-            name = 'Team ' + str(i + 2)
-            new_team = Team(name=name, password='123', subject=subject)
+            name = 'Team ' + str(i + 1)
+            new_team = Team(name=name, subject=subject)
             new_team.save()
 
             tas = CustomUser.objects.filter(role='TA')
@@ -160,19 +160,20 @@ class TestData(APIView):
             is_res.save()
             new_team.responsible = ta
             new_team.save()
-
+            pre_reg_ta = PreTeamRegister(feide_username=ta.username, role='TA', team=new_team, subject=subject)
+            pre_reg_ta.save()
 
             team_sum = 0
             team_score_counter = 0
 
             for h in range(4):
-                user_name = 'Testuser ' + str(user_counter)
+                username = 'testuser' + str(user_counter)
                 user_id = 'test-' + str(user_counter)
 
                 test_user = CustomUser(
-                    username=user_name,
+                    username=username,
                     user_id=user_id,
-                    name=user_name,
+                    name=username,
                     role='SD',
                     selected_subject_id=1
                 )
@@ -180,8 +181,10 @@ class TestData(APIView):
 
                 is_on_team = UserIsOnTeam(user=test_user, team=new_team)
                 is_on_team.save()
+                pre_reg = PreTeamRegister(feide_username=username, role='SD', team=new_team, subject=subject)
+                pre_reg.save()
 
-                for k in range(10):
+                for k in range(5):
                     score_value = random.randint(1, 5)
                     date = datetime.datetime.now()
                     test_score = Score(score=score_value, user=test_user, team=new_team, date_registered=date)
@@ -194,6 +197,8 @@ class TestData(APIView):
 
             team_average = team_sum / team_score_counter
             new_team.last_average_score = team_average
+            new_team.diverse_scores = True
+            new_team.number_of_scores = team_score_counter
             new_team.save()
 
         return Response('data generated', status=status.HTTP_200_OK)
