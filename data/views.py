@@ -147,11 +147,25 @@ class TestData(APIView):
     @csrf_exempt
     def get(self, request):
 
+        """for team in Team.objects.all():
+            name = team.name
+
+            number_str = name.split(' ')[1]
+            try:
+                number = int(number_str)
+            except ValueError:
+                number = 0
+
+            team.team_number = number
+            team.save()"""
+
+
         user_counter = 3
         for i in range(50):
             subject = Subject.objects.get(pk=1)
-            name = 'Team ' + str(i + 1)
-            new_team = Team(name=name, subject=subject)
+            number = i + 1
+            name = 'Team ' + str(number)
+            new_team = Team(name=name, subject=subject, team_number=number)
             new_team.save()
 
             tas = CustomUser.objects.filter(role='TA')

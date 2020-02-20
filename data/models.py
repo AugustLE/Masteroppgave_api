@@ -21,6 +21,7 @@ class Team(models.Model):
     responsible = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
     number_of_scores = models.IntegerField(default=0)
     diverse_scores = models.BooleanField(default=False)
+    team_number = models.IntegerField()
 
     class Meta:
         unique_together = ('name', 'subject',)

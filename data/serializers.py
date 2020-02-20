@@ -18,7 +18,16 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ('pk', 'name', 'subject', 'last_average_score', 'responsible', 'number_of_scores', 'diverse_scores')
+        fields = (
+            'pk',
+            'name',
+            'subject',
+            'last_average_score',
+            'responsible',
+            'number_of_scores',
+            'diverse_scores',
+            'team_number'
+        )
 
 
 class PrivacyConsentSerializer(serializers.ModelSerializer):
