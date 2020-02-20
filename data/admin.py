@@ -37,7 +37,7 @@ class ScoreAdmin(admin.ModelAdmin):
 class UserIsOnTeamAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'team')
-    search_fields = ('user__username', 'team__name')
+    search_fields = ('user__username', )
 
 
 class IsResponsibleForTeamAdmin(admin.ModelAdmin):
@@ -53,7 +53,7 @@ class PrivacyConsentAdmin(admin.ModelAdmin):
 class PreTeamRegisterAdmin(admin.ModelAdmin):
 
     list_display = ('feide_username', 'team', 'role')
-    search_fields = ('feide_username', 'team_name')
+    search_fields = ('feide_username', 'team__name')
     list_filter = ('role',)
 
 

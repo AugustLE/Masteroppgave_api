@@ -35,6 +35,9 @@ class UserIsOnTeam(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('user', 'team')
+
 
 class Score(models.Model):
 

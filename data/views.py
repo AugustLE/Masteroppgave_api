@@ -55,6 +55,46 @@ class SelectSubject(APIView):
         return Response(user_data, status=status.HTTP_200_OK)
 
 
+class SelectSubjectWithTeams(APIView):
+
+    @csrf_exempt
+    def post(self, request):
+
+        user = request.user
+        subject_id = request.data.get('subject_id')
+        subject = Subject.objects.get(pk=subject_id)
+
+        if AuthorizedInstructor.objects.filter(subject=subject, feide_username=user.username).count() > 1:
+            user.role = 'IN'
+            user.save()
+
+        user.selected_subject_id = subject_id
+        user.role = 'SD'
+        user.save()
+
+        teams = Team.objects.filter(subject=subject)
+        team_data = TeamSerializer(teams, many=True).data
+
+        user_data = UserSerializer(user, many=False).data
+        return_object = {'user': user_data, 'teams': team_data}
+
+        return Response(return_object, status=status.HTTP_200_OK)
+
+
+class TeamList(APIView):
+
+    @csrf_exempt
+    def get(self, request):
+        user = request.user
+        subject_id = user.selected_subject_id
+        subject = Subject.objects.get(pk=subject_id)
+
+        teams = Team.objects.filter(subject=subject)
+        team_data = TeamSerializer(teams, many=True).data
+
+        return Response(team_data, status=status.HTTP_200_OK)
+
+
 class ApiUser(APIView):
 
     permission_classes = (permissions.IsAuthenticated, )

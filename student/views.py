@@ -50,10 +50,11 @@ class SelectTeam(APIView):
 
         user = request.user
         team_id = request.data.get('team_id')
-        team_password = request.data.get('team_password')
+        team = Team.objects.get(pk=team_id)
+        """team_password = request.data.get('team_password')
         team = Team.objects.get(pk=team_id)
         if team_password != team.password:
-            return Response({'message': 'wrong_password'})
+            return Response({'message': 'wrong_password'})"""
 
         register_on_team = UserIsOnTeam(team=team, user=user)
         register_on_team.save()
@@ -153,3 +154,4 @@ class RegisterScore(APIView):
         }
 
         return Response(return_object, status=status.HTTP_200_OK)
+
