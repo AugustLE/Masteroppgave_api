@@ -59,6 +59,12 @@ class TeamList(APIView):
         teams = Team.objects.filter(subject=subject)
 
         team_data = TeamSerializer(teams, many=True).data
+
+        for team in team_data:
+            if team['responsible'] == user.name:
+                team['pinned'] = True
+                team_data.insert(0, team_data.pop(team_data.index(team)))
+
         subject_data = SubjectSerializer(subject, many=False).data
 
         return_object = {
