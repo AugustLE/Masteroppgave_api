@@ -34,6 +34,7 @@ class CreateOrLoginUser(APIView):
         userid = request.data.get('userid')
         username = request.data.get('username')
         name = request.data.get('name')
+        email = request.data.get('email')
         auth_token = request.data.get('auth_token')
 
         if PrivacyConsent.objects.filter(username=username).count() == 0:
@@ -44,7 +45,7 @@ class CreateOrLoginUser(APIView):
                 return Response({}, status=status.HTTP_200_OK)
 
         if CustomUser.objects.filter(username=username).count() == 0:
-            user = CustomUser(username=username, user_id=userid, name=name)
+            user = CustomUser(username=username, user_id=userid, name=name, email=email)
             user.set_password(TEMP_PASSWORD)
             user.save()
 

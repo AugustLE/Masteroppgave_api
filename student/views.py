@@ -6,6 +6,7 @@ from rest_framework import status
 from data.models import Team, Subject, UserIsOnTeam, Score
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
+from user.serializers import UserSerializer
 from django.db.models import Sum
 import datetime
 import pytz
@@ -155,3 +156,27 @@ class RegisterScore(APIView):
 
         return Response(return_object, status=status.HTTP_200_OK)
 
+
+class UnregisterFromTeam(APIView):
+
+    @csrf_exempt
+    def post(self, request):
+
+        user = request.user
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        user_on_team = UserIsOnTeam.objects.get(user=user, team__subject=subject)
+        user_on_team.delete()
+        return Response({}, status=status.HTTP_200_OK)
+
+
+class ContactInfo(APIView):
+
+    @csrf_exempt
+    def get(self, request):
+
+        user = request.user
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        team = UserIsOnTeam.objects.get(user=user, team__subject=subject).team
+        responsible = team.responsible
+        response_data = UserSerializer(responsible, many=False).data
+        return Response(response_data, status=status.HTTP_200_OK)
