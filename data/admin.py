@@ -31,6 +31,7 @@ class TeamAdmin(admin.ModelAdmin):
 class ScoreAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'team', 'score', 'date_registered')
+    search_fields = ('user__name', 'team__name')
     # readonly_fields = ('date_registered',)
 
 

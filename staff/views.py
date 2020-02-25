@@ -30,7 +30,7 @@ class Overview(APIView):
         if total_sum > 0 and counter > 0:
             total_average = round(total_sum/counter, 1)
 
-        teams_below = Team.objects.filter(last_average_score__lte=2.5).count()
+        teams_below = Team.objects.filter(last_average_score__lte=2.5, diverse_scores=True).count()
         responsible_teams = Team.objects.filter(isresponsibleforteam__user=user, subject=subject)
         responsible_teams_data = None
         if responsible_teams.count() > 0:

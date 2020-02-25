@@ -7,6 +7,7 @@ from data.models import Team, Subject, UserIsOnTeam, Score
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
 from user.serializers import UserSerializer
+from .serializers import ScoreSerializer
 from django.db.models import Sum
 import datetime
 import pytz
@@ -180,3 +181,18 @@ class ContactInfo(APIView):
         responsible = team.responsible
         response_data = UserSerializer(responsible, many=False).data
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class History(APIView):
+
+    @csrf_exempt
+    def get(self, request):
+
+        user = request.user
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        scores = Score.objects.filter(user=user, team__subject=subject)
+        scores = scores.order_by('-date_registered')
+        return_object = ScoreSerializer(scores, many=True).data
+
+        return Response(return_object, status=status.HTTP_200_OK)
+
