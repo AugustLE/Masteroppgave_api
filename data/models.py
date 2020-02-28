@@ -83,3 +83,16 @@ class PreTeamRegister(models.Model):
 
     class Meta:
         unique_together = ('feide_username', 'team',)
+
+
+class RequestAuthority(models.Model):
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    approved = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'subject')
+
+    def __str__(self):
+        return self.user.name

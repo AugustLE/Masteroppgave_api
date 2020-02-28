@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Team, Subject, Score, UserIsOnTeam, \
-    IsResponsibleForTeam, PrivacyConsent, PreTeamRegister
+    IsResponsibleForTeam, PrivacyConsent, PreTeamRegister, RequestAuthority
 
 
 class TeamInline(admin.StackedInline):
@@ -65,3 +65,4 @@ admin.site.register(UserIsOnTeam, UserIsOnTeamAdmin)
 admin.site.register(IsResponsibleForTeam, IsResponsibleForTeamAdmin)
 admin.site.register(PrivacyConsent, PrivacyConsentAdmin)
 admin.site.register(PreTeamRegister, PreTeamRegisterAdmin)
+admin.site.register(RequestAuthority)

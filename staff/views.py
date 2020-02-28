@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
-from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score, PreTeamRegister
+from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score, PreTeamRegister, RequestAuthority
 from user.models import CustomUser
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
@@ -184,3 +184,30 @@ class TeamUploader(APIView):
                         pre_student_register.save()
 
         return Response({}, status=status.HTTP_200_OK)
+
+
+class CheckAuthority(APIView):
+
+    @csrf_exempt
+    def get(self, request):
+
+        user = request.user
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        if RequestAuthority.objects.filter(user=user, subject=subject, approved=True).count() > 0:
+            return Response(True, status=status.HTTP_200_OK)
+
+        if RequestAuthority.objects.filter(user=user, subject=subject, approved=False).count() == 0:
+            return Response(None, status=status.HTTP_200_OK)
+
+        print('FIRE')
+        return Response(False, status=status.HTTP_200_OK)
+
+    @csrf_exempt
+    def post(self, request):
+
+        user = request.user
+        subject = Subject.objects.get(pk=user.selected_subject_id)
+        request_auth = RequestAuthority(user=user, subject=subject)
+        request_auth.save()
+
+        return Response(False, status=status.HTTP_200_OK)
