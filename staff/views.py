@@ -125,11 +125,12 @@ class TeamUploader(APIView):
         team_json = request.data.get('team_json')
         for team in team_json:
 
+            team_number = 0 # må gis riktig nummer
             user_subject = Subject.objects.get(pk=user.selected_subject_id)
             responsible = None
 
             if Team.objects.filter(name=team['name']).count() == 0:
-                current_team = Team(name=team['name'], subject=user_subject)
+                current_team = Team(name=team['name'], subject=user_subject, team_number=team_number)
                 current_team.save()
             else:
                 current_team = Team.objects.get(name=team['name'], subject=user_subject)
@@ -199,7 +200,6 @@ class CheckAuthority(APIView):
         if RequestAuthority.objects.filter(user=user, subject=subject, approved=False).count() == 0:
             return Response(None, status=status.HTTP_200_OK)
 
-        print('FIRE')
         return Response(False, status=status.HTTP_200_OK)
 
     @csrf_exempt
