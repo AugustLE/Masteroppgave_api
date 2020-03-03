@@ -11,6 +11,7 @@ urlpatterns = [
 
     url(r'^user/detail/$', views.UserDetail.as_view()),
     url(r'^user/feidelogin/$', views.CreateOrLoginUser.as_view()),
+    url(r'^user/delete/$', views.DeleteUser.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

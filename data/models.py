@@ -42,12 +42,15 @@ class UserIsOnTeam(models.Model):
 class Score(models.Model):
 
     score = models.IntegerField(verbose_name='score')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     date_registered = models.DateTimeField(verbose_name='date_registered') ## in prod auto_now_add=True
 
     def __str__(self):
-        return self.user.name
+        if self.user:
+            return self.user.name
+        else:
+            return 'Anonymisert'
 
 
 class IsResponsibleForTeam(models.Model):

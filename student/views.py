@@ -128,13 +128,17 @@ class RegisterScore(APIView):
             score_sum = 0
 
         participants = []
+        anonymous_scores = 0
         for score in all_scores:
-            participant = score.user.username
-            if participant not in participants:
-                participants.append(participant)
+            if score.user:
+                participant = score.user.username
+                if participant not in participants:
+                    participants.append(participant)
+            else:
+                anonymous_scores += 1
 
         diverse_scores = False
-        if len(participants) > 2:
+        if len(participants) + anonymous_scores > 3:
             diverse_scores = True
 
         time_now = get_current_oslo_time()

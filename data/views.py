@@ -47,6 +47,10 @@ class SelectSubject(APIView):
 
             user.selected_subject_id = subject_id
 
+        if UserIsOnTeam.objects.filter(user=user, team__subject=subject).count() > 0:
+            user.role = 'SD'
+            user.selected_subject_id = subject_id
+
         user.save()
 
         user_data = UserSerializer(user, many=False).data

@@ -125,7 +125,8 @@ class TeamUploader(APIView):
         team_json = request.data.get('team_json')
         for team in team_json:
 
-            team_number = 0 # må gis riktig nummer
+            team_number_string = team['name'].split(' ')[1]
+            team_number = int(team_number_string)
             user_subject = Subject.objects.get(pk=user.selected_subject_id)
             responsible = None
 
@@ -136,6 +137,9 @@ class TeamUploader(APIView):
                 current_team = Team.objects.get(name=team['name'], subject=user_subject)
 
             role = 'TA'
+            if not team['responsible'] and not team['instructor']:
+                return Response({}, status=status.HTTP_200_OK)
+
             feide_username = team['responsible']
             if team['instructor']:
                 role = 'IN'

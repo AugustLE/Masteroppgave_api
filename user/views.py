@@ -79,5 +79,18 @@ class CreateOrLoginUser(APIView):
         return Response(user_data, status=status.HTTP_200_OK)
 
 
+class DeleteUser(APIView):
+
+    permission_classes = (permissions.IsAuthenticated, )
+
+    @csrf_exempt
+    def delete(self, request):
+        user = request.user
+        privacy_consent = PrivacyConsent.objects.get(username=user.username)
+        privacy_consent.delete()
+        user.delete()
+        return Response(True, status.HTTP_200_OK)
+
+
 
 
