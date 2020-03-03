@@ -1,3 +1,3 @@
 Prosjektoppgave_API
 
-The API for the Group Health Application
+The API for TeamAccelerator
