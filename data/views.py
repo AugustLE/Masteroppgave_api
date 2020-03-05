@@ -34,7 +34,7 @@ class SelectSubject(APIView):
             permission = True
             pre_register = PreTeamRegister.objects.get(feide_username=user.username, subject=subject)
             user.role = pre_register.role
-            if pre_register.role == 'SD':
+            if pre_register.role == 'SD' and UserIsOnTeam.objects.filter(user=user, team__subject=subject).count() == 0:
                 new_on_team = UserIsOnTeam(team=pre_register.team, user=user)
                 new_on_team.save()
             elif pre_register.role == 'IN' or pre_register.role == 'TA':

@@ -14,6 +14,8 @@ urlpatterns = [
     url(r'^staff/teams/upload/$', views.TeamUploader.as_view()),
     url(r'^staff/requestauth/$', views.CheckAuthority.as_view()),
     url(r'^staff/getauth/$', views.CheckAuthority.as_view()),
+    url(r'^staff/pinteam/$', views.PinTeam.as_view()),
+    url(r'^staff/unpinteam/$', views.PinTeam.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

@@ -3,10 +3,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
-from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score, PreTeamRegister, RequestAuthority
+from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score, PreTeamRegister, RequestAuthority, \
+    PinOnTeam
 from user.models import CustomUser
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
+
+
+def get_teams_below(user):
+    teams_below = Team.objects.filter(last_average_score__lte=2.5, diverse_scores=True)
+    teams_below_data = TeamSerializer(teams_below, many=True).data
+    for team in teams_below_data:
+        db_team = Team.objects.get(pk=team['pk'])
+        if PinOnTeam.objects.filter(user=user, team=db_team).count() > 0:
+            team['pinned'] = True
+    return teams_below_data
 
 
 class Overview(APIView):
@@ -30,7 +41,8 @@ class Overview(APIView):
         if total_sum > 0 and counter > 0:
             total_average = round(total_sum/counter, 1)
 
-        teams_below = Team.objects.filter(last_average_score__lte=2.5, diverse_scores=True).count()
+        teams_below_data = get_teams_below(user)
+
         responsible_teams = Team.objects.filter(isresponsibleforteam__user=user, subject=subject)
         responsible_teams_data = None
         if responsible_teams.count() > 0:
@@ -38,12 +50,12 @@ class Overview(APIView):
 
         return_object = {
             'total_average': total_average,
-            'number_teams_below': teams_below,
+            'number_teams_below': len(teams_below_data),
+            'teams_below': teams_below_data,
             'responsible_teams': responsible_teams_data,
             'subject': subject_data,
             'number_of_teams': number_of_teams
         }
-
         return Response(return_object, status=status.HTTP_200_OK)
 
 
@@ -62,6 +74,11 @@ class TeamList(APIView):
 
         for team in team_data:
             if team['responsible'] == user.name:
+                team['pinned'] = True
+                team_data.insert(0, team_data.pop(team_data.index(team)))
+
+            db_team = Team.objects.get(pk=team['pk'])
+            if PinOnTeam.objects.filter(user=user, team=db_team).count() > 0:
                 team['pinned'] = True
                 team_data.insert(0, team_data.pop(team_data.index(team)))
 
@@ -105,12 +122,14 @@ class TeamInfo(APIView):
 
             members.append({'name': member.user.name, 'average_score': member_average})
 
+        if PinOnTeam.objects.filter(user=request.user, team=team).count() > 0:
+            team_data['pinned'] = True
+
         return_object = {
             'responsible': responsible_name,
             'members': members,
-            'team': team_data
+            'team': team_data,
         }
-        print(return_object)
 
         return Response(return_object, status=status.HTTP_200_OK)
 
@@ -215,3 +234,48 @@ class CheckAuthority(APIView):
         request_auth.save()
 
         return Response(False, status=status.HTTP_200_OK)
+
+
+class PinTeam(APIView):
+
+    @csrf_exempt
+    def post(self, request):
+
+        user = request.user
+        team_id = request.data.get('team_id')
+        team = Team.objects.get(pk=team_id)
+        if PinOnTeam.objects.filter(user=user, team=team).count() == 0:
+            new_pin = PinOnTeam(user=user, team=team)
+            new_pin.save()
+
+        team_data = TeamSerializer(team, many=False).data
+        team_data['pinned'] = True
+
+        teams_below = get_teams_below(user)
+
+        return_object = {
+            'team': team_data,
+            'teams_below': teams_below
+        }
+        return Response(return_object, status=status.HTTP_200_OK)
+
+    @csrf_exempt
+    def delete(self, request):
+
+        user = request.user
+        team_id = request.data.get('team_id')
+        team = Team.objects.get(pk=team_id)
+        old_pin = PinOnTeam.objects.get(user=user, team=team)
+        old_pin.delete()
+        team_data = TeamSerializer(team, many=False).data
+        team_data['pinned'] = False
+        teams_below = get_teams_below(user)
+
+        return_object = {
+            'team': team_data,
+            'teams_below': teams_below
+        }
+        return Response(return_object, status=status.HTTP_200_OK)
+
+
+

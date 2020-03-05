@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Team, Subject, Score, UserIsOnTeam, \
-    IsResponsibleForTeam, PrivacyConsent, PreTeamRegister, RequestAuthority
+    IsResponsibleForTeam, PrivacyConsent, PreTeamRegister, RequestAuthority, PinOnTeam
 
 
 class TeamInline(admin.StackedInline):
@@ -58,6 +58,11 @@ class PreTeamRegisterAdmin(admin.ModelAdmin):
     list_filter = ('role',)
 
 
+class PinOnTeamAdmin(admin.ModelAdmin):
+
+    list_display = ('user', 'team')
+
+
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Score, ScoreAdmin)
@@ -66,3 +71,4 @@ admin.site.register(IsResponsibleForTeam, IsResponsibleForTeamAdmin)
 admin.site.register(PrivacyConsent, PrivacyConsentAdmin)
 admin.site.register(PreTeamRegister, PreTeamRegisterAdmin)
 admin.site.register(RequestAuthority)
+admin.site.register(PinOnTeam, PinOnTeamAdmin)
