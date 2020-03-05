@@ -8,6 +8,7 @@ from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score
 from user.models import CustomUser
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
+import datetime
 
 
 def get_teams_below(user):
@@ -278,4 +279,47 @@ class PinTeam(APIView):
         return Response(return_object, status=status.HTTP_200_OK)
 
 
+class TeamHistory(APIView):
+
+    @csrf_exempt
+    def get(self, request, team_id):
+        team = Team.objects.get(pk=team_id)
+        scores = Score.objects.filter(team=team).order_by('-date_registered')
+
+        history_dict = {}
+        history_count_dict = {}
+        next_monday_dict = {}
+        for score in scores:
+            monday = score.date_registered - datetime.timedelta(days=score.date_registered.weekday())
+            coming_monday_dt = score.date_registered + datetime.timedelta(days=-score.date_registered.weekday(), weeks=1)
+            dict_key = str(monday.day) + '/' + str(monday.month) + '-' + str(monday.year)
+            coming_monday = str(coming_monday_dt.day) + '/' + str(coming_monday_dt.month) + '-' + str(coming_monday_dt.year)
+
+            if dict_key not in next_monday_dict:
+                next_monday_dict[dict_key] = coming_monday
+
+            if dict_key in history_dict.keys():
+                history_dict[dict_key] += score.score
+            else:
+                history_dict[dict_key] = score.score
+
+            if dict_key in history_count_dict.keys():
+                history_count_dict[dict_key] += 1
+            else:
+                history_count_dict[dict_key] = 1
+
+        return_list = []
+        for key in history_dict.keys():
+            average_week = history_dict[key] / history_count_dict[key]
+            first_monday = key.split('-')[0]
+            last_monday = next_monday_dict[key].split('-')[0]
+            week = first_monday + ' - ' + last_monday
+            week_object = {
+                'week': week,
+                'average': average_week,
+                'year': key.split('-')[1]
+            }
+            return_list.append(week_object)
+
+        return Response(return_list, status=status.HTTP_200_OK)
 

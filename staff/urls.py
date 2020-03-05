@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^staff/getauth/$', views.CheckAuthority.as_view()),
     url(r'^staff/pinteam/$', views.PinTeam.as_view()),
     url(r'^staff/unpinteam/$', views.PinTeam.as_view()),
+    url(r'^staff/teamhistory/(?P<team_id>[0-9]+)/$', views.TeamHistory.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
