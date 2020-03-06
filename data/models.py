@@ -70,7 +70,7 @@ class PrivacyConsent(models.Model):
 
 class AuthorizedInstructor(models.Model):
 
-    feide_username = models.CharField(max_length=100, unique=True)
+    feide_username = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

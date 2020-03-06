@@ -25,11 +25,13 @@ class SelectSubject(APIView):
         subject_id = request.data.get('subject_id')
         subject = Subject.objects.get(pk=subject_id)
 
-        if AuthorizedInstructor.objects.filter(subject=subject, feide_username=user.username).count() > 1:
-            user.role = 'IN'
-            user.save()
-
         permission = False
+
+        if AuthorizedInstructor.objects.filter(subject=subject, feide_username=user.username).count() > 0:
+            user.role = 'IN'
+            permission = True
+            user.selected_subject_id = subject_id
+
         if PreTeamRegister.objects.filter(feide_username=user.username, subject=subject).count() > 0:
             permission = True
             pre_register = PreTeamRegister.objects.get(feide_username=user.username, subject=subject)
@@ -56,6 +58,8 @@ class SelectSubject(APIView):
         user_data = UserSerializer(user, many=False).data
         if not permission:
             user_data['error'] = 'You dont have permission to this course'
+
+        print(user_data)
         return Response(user_data, status=status.HTTP_200_OK)
 
 
@@ -183,7 +187,20 @@ class SubjectList(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
+class UnselectSubject(APIView):
+
+    @csrf_exempt
+    def post(self, request):
+
+        user = request.user
+        user.selected_subject_id = None
+        user.role = None
+        user.save()
+        user_data = UserSerializer(user, many=False).data
+        return Response(user_data, status=status.HTTP_200_OK)
+
 ### TEST FUNCTION TO GENERATE TEST DATA
+"""
 class TestData(APIView):
 
     permission_classes = (permissions.AllowAny, )
@@ -191,17 +208,17 @@ class TestData(APIView):
     @csrf_exempt
     def get(self, request):
 
-        """for team in Team.objects.all():
-            name = team.name
+        #for team in Team.objects.all():
+         #   name = team.name
 
-            number_str = name.split(' ')[1]
-            try:
-                number = int(number_str)
-            except ValueError:
-                number = 0
+          #  number_str = name.split(' ')[1]
+           # try:
+        #    number = int(number_str)
+         #   except ValueError:
+          #      number = 0
 
-            team.team_number = number
-            team.save()"""
+           # team.team_number = number
+            #team.save()
 
 
         user_counter = 3
@@ -260,5 +277,7 @@ class TestData(APIView):
             new_team.save()
 
         return Response('data generated', status=status.HTTP_200_OK)
+"""
 
-#
+
+

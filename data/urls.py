@@ -10,10 +10,11 @@ app_name = 'data'
 urlpatterns = [
 
     url(r'^selectsubject/$', views.SelectSubject.as_view()),
+    url(r'^unselectsubject/$', views.UnselectSubject.as_view()),
     url(r'^selectsubjectwithteams/$', views.SelectSubjectWithTeams.as_view()),
     url(r'^user/$', views.ApiUser.as_view()),
     ###
-    url(r'^testdata/$', views.TestData.as_view()),
+    #url(r'^testdata/$', views.TestData.as_view()),
     url(r'^privacyconsent/(?P<username>\w+)/$', views.GetPrivacyConsent.as_view()),
     url(r'^privacyconsent/$', views.GetPrivacyConsent.as_view()),
     url(r'^subjectlist/$', views.SubjectList.as_view()),
