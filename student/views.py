@@ -86,7 +86,7 @@ class TeamStatus(APIView):
             last_score_value = last_score.score
 
         today = get_current_oslo_time()
-        last_monday = today - datetime.timedelta(days=today.weekday())
+        last_monday = today.date() - datetime.timedelta(days=today.weekday())
         # coming_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
 
         has_rated_this_week = False
