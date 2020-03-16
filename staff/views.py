@@ -9,6 +9,7 @@ from data.models import Subject, Team, IsResponsibleForTeam, UserIsOnTeam, Score
 from user.models import CustomUser
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
+from user.serializers import UserSerializer
 import datetime
 
 
@@ -290,6 +291,7 @@ class TeamHistory(APIView):
         history_dict = {}
         history_count_dict = {}
         next_monday_dict = {}
+        user_score_dict = {}
         for score in scores:
             monday = score.date_registered - datetime.timedelta(days=score.date_registered.weekday())
             coming_monday_dt = score.date_registered + datetime.timedelta(days=-score.date_registered.weekday(), weeks=1)
@@ -309,6 +311,13 @@ class TeamHistory(APIView):
             else:
                 history_count_dict[dict_key] = 1
 
+            user_data = UserSerializer(score.user, many=False).data
+            score_date = str(score.date_registered.day) + '/' + str(score.date_registered.month)
+            if dict_key not in user_score_dict:
+                user_score_dict[dict_key] = [{'user': user_data, 'score': score.score, 'score_date': score_date}]
+            else:
+                user_score_dict[dict_key].append({'user': user_data, 'score': score.score, 'score_date': score_date})
+
         return_list = []
         for key in history_dict.keys():
             average_week = history_dict[key] / history_count_dict[key]
@@ -318,9 +327,9 @@ class TeamHistory(APIView):
             week_object = {
                 'week': week,
                 'average': average_week,
-                'year': key.split('-')[1]
+                'year': key.split('-')[1],
+                'users': user_score_dict[key]
             }
             return_list.append(week_object)
-
         return Response(return_list, status=status.HTTP_200_OK)
 
