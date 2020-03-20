@@ -105,8 +105,10 @@ class TeamInfo(APIView):
         team = Team.objects.get(pk=team_id)
         team_data = TeamSerializer(team, many=False).data
         responsible_name = None
+        responsible_email = None
         if team.responsible:
             responsible_name = team.responsible.name
+            responsible_email = team.responsible.email
 
         is_on_teams = UserIsOnTeam.objects.filter(team=team)
         members = []
@@ -128,8 +130,14 @@ class TeamInfo(APIView):
         if PinOnTeam.objects.filter(user=request.user, team=team).count() > 0:
             team_data['pinned'] = True
 
+        responsible = {
+            'name': responsible_name,
+            'email': responsible_email
+        }
+
         return_object = {
-            'responsible': responsible_name,
+            'responsible': responsible,
+            'responsible_email': responsible_email,
             'members': members,
             'team': team_data,
         }
@@ -320,14 +328,22 @@ class TeamHistory(APIView):
 
         return_list = []
         for key in history_dict.keys():
+            split_by_day = key.split('/')
+            day = split_by_day[0]
+            month = split_by_day[1].split('-')[0]
+            year = key.split('-')[1]
+
             average_week = history_dict[key] / history_count_dict[key]
             first_monday = key.split('-')[0]
             last_monday = next_monday_dict[key].split('-')[0]
             week = first_monday + ' - ' + last_monday
+
+            week_number = datetime.date(int(year), int(month), int(day)).isocalendar()[1]
             week_object = {
                 'week': week,
+                'week_number': week_number,
                 'average': average_week,
-                'year': key.split('-')[1],
+                'year': year,
                 'users': user_score_dict[key]
             }
             return_list.append(week_object)
