@@ -35,18 +35,20 @@ class SelectSubject(APIView):
 
         if PreTeamRegister.objects.filter(feide_username=user.username, subject=subject).count() > 0:
             permission = True
-            pre_register = PreTeamRegister.objects.get(feide_username=user.username, subject=subject)
-            user.role = pre_register.role
-            if pre_register.role == 'SD' and UserIsOnTeam.objects.filter(user=user, team__subject=subject).count() == 0:
-                new_on_team = UserIsOnTeam(team=pre_register.team, user=user)
-                new_on_team.save()
-            elif pre_register.role == 'IN' or pre_register.role == 'TA':
-                if IsResponsibleForTeam.objects.filter(user=user, team=pre_register.team).count() == 0:
-                    new_responsible = IsResponsibleForTeam(user=user, team=pre_register.team)
-                    new_responsible.save()
+            pre_registers = PreTeamRegister.objects.filter(feide_username=user.username, subject=subject)
 
-                pre_register.team.responsible = user
-                pre_register.team.save()
+            for pre_register in pre_registers:
+                user.role = pre_register.role
+                if pre_register.role == 'SD' and UserIsOnTeam.objects.filter(user=user, team__subject=subject).count() == 0:
+                    new_on_team = UserIsOnTeam(team=pre_register.team, user=user)
+                    new_on_team.save()
+                elif pre_register.role == 'IN' or pre_register.role == 'TA':
+                    if IsResponsibleForTeam.objects.filter(user=user, team=pre_register.team).count() == 0:
+                        new_responsible = IsResponsibleForTeam(user=user, team=pre_register.team)
+                        new_responsible.save()
+
+                    pre_register.team.responsible = user
+                    pre_register.team.save()
 
             user.selected_subject_id = subject_id
 
