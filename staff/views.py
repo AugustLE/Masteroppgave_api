@@ -72,7 +72,6 @@ class TeamList(APIView):
         user = request.user
         subject = Subject.objects.get(pk=user.selected_subject_id)
         teams = Team.objects.filter(subject=subject)
-
         team_data = TeamSerializer(teams, many=True).data
 
         for team in team_data:
@@ -349,3 +348,29 @@ class TeamHistory(APIView):
             return_list.append(week_object)
         return Response(return_list, status=status.HTTP_200_OK)
 
+
+class TeamUploader2(APIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @csrf_exempt
+    def post(self, request):
+        user = request.user
+        user_subject = Subject.objects.get(pk=user.selected_subject_id)
+        team_json = request.data.get('team_json')
+        for team in team_json:
+
+            team_number = int(team['team_number'])
+            team_name = team['name']
+            team_member = team['member']
+            if Team.objects.filter(name=team_name, team_number=team_number, subject=user_subject).count() == 0:
+                team = Team(name=team_name, team_number=team_number, subject=user_subject)
+                team.save()
+            else:
+                team = Team.objects.get(name=team_name, team_number=team_number, subject=user_subject)
+
+            if PreTeamRegister.objects.filter(feide_username=team_member, team=team, subject=user_subject).count() == 0:
+                pre_member_register = PreTeamRegister(feide_username=team_member, role='SD', team=team, subject=user_subject)
+                pre_member_register.save()
+
+        return Response({}, status=status.HTTP_200_OK)

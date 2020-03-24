@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^staff/overview/$', views.Overview.as_view()),
     url(r'^staff/teams/$', views.TeamList.as_view()),
     url(r'^staff/teams/(?P<team_id>[0-9]+)/$', views.TeamInfo.as_view()),
-    url(r'^staff/teams/upload/$', views.TeamUploader.as_view()),
+    url(r'^staff/teams/upload/$', views.TeamUploader2.as_view()),
     url(r'^staff/requestauth/$', views.CheckAuthority.as_view()),
     url(r'^staff/getauth/$', views.CheckAuthority.as_view()),
     url(r'^staff/pinteam/$', views.PinTeam.as_view()),
