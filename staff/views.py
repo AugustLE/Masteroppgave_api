@@ -75,6 +75,7 @@ class TeamList(APIView):
         team_data = TeamSerializer(teams, many=True).data
 
         for team in team_data:
+
             if team['responsible'] == user.name:
                 team['pinned'] = True
                 team_data.insert(0, team_data.pop(team_data.index(team)))

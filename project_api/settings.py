@@ -14,7 +14,13 @@ SECRET_KEY = '!hi%8z+!0sd*ijv9a__nx*+dm)f0b86h&!(49cbq*x)oq&^$b#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', '129.241.106.34', 'https://teamaccelerator.idi.ntnu.no', 'teamaccelerator.idi.ntnu.no']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '129.241.106.34',
+    'https://backend-teamaccelerator.idi.ntnu.no',
+    'backend-teamaccelerator.idi.ntnu.no',
+
+]
 
 AUTH_USER_MODEL = 'user.CustomUser'
 
@@ -48,11 +54,13 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-    "http://127.0.0.1:8000",
+    'http://localhost:3000',
+    'http://127.0.0.1:8000',
     'https://teamaccelerator.idi.ntnu.no',
-    "https://teamaccelerator.surge.sh",
-    "https://teamacceleratoreu.herokuapp.com"
+    'https://teamaccelerator.surge.sh',
+    'https://teamacceleratoreu.herokuapp.com',
+    'https://backend-teamaccelerator.idi.ntnu.no',
+    'backend-teamaccelerator.idi.ntnu.no',
 ]
 
 ROOT_URLCONF = 'project_api.urls'
