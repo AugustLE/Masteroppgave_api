@@ -60,7 +60,6 @@ CORS_ORIGIN_WHITELIST = [
     'https://teamaccelerator.surge.sh',
     'https://teamacceleratoreu.herokuapp.com',
     'https://backend-teamaccelerator.idi.ntnu.no',
-    'backend-teamaccelerator.idi.ntnu.no',
 ]
 
 ROOT_URLCONF = 'project_api.urls'
