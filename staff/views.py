@@ -37,8 +37,9 @@ class Overview(APIView):
         total_sum = 0
         counter = 0
         for team in teams:
-            total_sum += team.last_average_score
-            counter += 1
+            if team.last_average_score > 0:
+                total_sum += team.last_average_score
+                counter += 1
 
         total_average = None
         if total_sum > 0 and counter > 0:

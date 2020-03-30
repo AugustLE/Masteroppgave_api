@@ -19,7 +19,6 @@ ALLOWED_HOSTS = [
     '129.241.106.34',
     'https://backend-teamaccelerator.idi.ntnu.no',
     'backend-teamaccelerator.idi.ntnu.no',
-
 ]
 
 AUTH_USER_MODEL = 'user.CustomUser'
