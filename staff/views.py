@@ -58,7 +58,8 @@ class Overview(APIView):
             'teams_below': teams_below_data,
             'responsible_teams': responsible_teams_data,
             'subject': subject_data,
-            'number_of_teams': number_of_teams
+            'number_of_teams': number_of_teams,
+            'number_of_teams_with_scores': counter
         }
         return Response(return_object, status=status.HTTP_200_OK)
 

@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
-from data.models import Team, Subject, UserIsOnTeam, Score
+from data.models import Team, Subject, UserIsOnTeam, Score, PreTeamRegister
 from data.serializers import SubjectSerializer
 from data.serializers import TeamSerializer
 from user.serializers import UserSerializer
@@ -89,7 +89,7 @@ class TeamStatus(APIView):
         today = get_current_oslo_time()
         last_monday = today.date() - datetime.timedelta(days=today.weekday())
         # coming_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
-
+        number_of_ratings_this_week = 0
         has_rated_this_week = False
         if last_score and last_score.date_registered.date() >= last_monday:
             has_rated_this_week = True
@@ -102,6 +102,11 @@ class TeamStatus(APIView):
         member_names = []
         for member in is_on_teams:
             member_names.append(member.user.name)
+            member_scores = Score.objects.filter(user=member.user, team=team).order_by('-date_registered')
+            if member_scores.count() > 0:
+                last_score = member_scores[0]
+                if last_score.date_registered.date() >= last_monday:
+                    number_of_ratings_this_week += 1
 
         return_object = {
             'subject': subject_serializer.data,
@@ -109,7 +114,8 @@ class TeamStatus(APIView):
             'last_score': last_score_value,
             'has_rated_this_week': has_rated_this_week,
             'team_members': member_names,
-            'team_responsible': responsible_name
+            'team_responsible': responsible_name,
+            'number_of_ratings': number_of_ratings_this_week
         }
 
         return Response(return_object, status=status.HTTP_200_OK)
@@ -156,10 +162,23 @@ class RegisterScore(APIView):
 
         team_data = TeamSerializer(team, many=False).data
 
+        ### check number of ratings this week
+        today = get_current_oslo_time()
+        last_monday = today.date() - datetime.timedelta(days=today.weekday())
+        number_of_ratings = 0
+        is_on_teams = UserIsOnTeam.objects.filter(team=team)
+        for member in is_on_teams:
+            member_scores = Score.objects.filter(user=member.user, team=team).order_by('-date_registered')
+            if member_scores.count() > 0:
+                last_score = member_scores[0]
+                if last_score.date_registered.date() >= last_monday:
+                    number_of_ratings += 1
+
         return_object = {
             'team': team_data,
             'last_score': score_value,
-            'has_rated_this_week': True
+            'has_rated_this_week': True,
+            'number_of_ratings': number_of_ratings
         }
 
         return Response(return_object, status=status.HTTP_200_OK)
@@ -185,8 +204,18 @@ class ContactInfo(APIView):
         user = request.user
         subject = Subject.objects.get(pk=user.selected_subject_id)
         team = UserIsOnTeam.objects.get(user=user, team__subject=subject).team
-        responsible = team.responsible
-        response_data = UserSerializer(responsible, many=False).data
+        response_data = None
+        if team.responsible:
+            responsible = team.responsible
+            response_data = UserSerializer(responsible, many=False).data
+            response_data['registered'] = True
+        else:
+            pre_team_registers = PreTeamRegister.objects.filter(team=team, role='TA', subject=subject)
+            if pre_team_registers.count() > 0:
+                prt_reg = pre_team_registers[0]
+                email = prt_reg.feide_username + '@stud.ntnu.no'
+                response_data = {'email': email, 'registered': False}
+
         return Response(response_data, status=status.HTTP_200_OK)
 
 
