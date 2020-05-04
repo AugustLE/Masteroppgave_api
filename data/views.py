@@ -140,7 +140,6 @@ class ApiUser(APIView):
                 'team': team_data,
                 'subject': subject_data
             }
-        print(return_object)
         return Response(return_object, status=status.HTTP_200_OK)
 
 

@@ -9,3 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('pk', 'username', 'date_joined', 'role', 'selected_subject_id', 'name', 'email')
 
+
+
+
+

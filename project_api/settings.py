@@ -12,7 +12,7 @@ TOKEN_EXPIRE_TIME = datetime.timedelta(days=365)
 SECRET_KEY = '!hi%8z+!0sd*ijv9a__nx*+dm)f0b86h&!(49cbq*x)oq&^$b#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
